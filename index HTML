@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Berat dan Harga Baja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            max-width: 400px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 5px;
+            width: 180px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Kalkulator Baja</h2>
+
+    <div class="form-section">
+        <div class="form-group">
+            <label>Pilih Jenis Barang:</label>
+            <select id="jenisBaja" onchange="toggleBaja()">
+                <option value="diameter">Diameter (Round Bar)</option>
+                <option value="plat">Plat (Plate)</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="formDiameter" class="form-section">
+        <h3>Input Diameter</h3>
+        <div class="form-group"><label>QTY:</label><input type="number" id="qtyDia"></div>
+        <div class="form-group"><label>Diameter (MM):</label><input type="number" id="diaDia" step="any"></div>
+        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangDia" step="any"></div>
+        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaDia" step="any"></div>
+        <button onclick="hitungDiameter()">Tambahkan ke Tabel</button>
+    </div>
+
+    <div id="formPlat" class="form-section hidden">
+        <h3>Input Plat</h3>
+        <div class="form-group"><label>QTY:</label><input type="number" id="qtyPlat"></div>
+        <div class="form-group"><label>Tebal (MM):</label><input type="number" id="tebalPlat" step="any"></div>
+        <div class="form-group"><label>Lebar (MM):</label><input type="number" id="lebarPlat" step="any"></div>
+        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangPlat" step="any"></div>
+        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaPlat" step="any"></div>
+        <button onclick="hitungPlat()">Tambahkan ke Tabel</button>
+    </div>
+
+    <table id="tabelDiameter">
+        <thead>
+            <tr>
+                <th>QTY</th>
+                <th>DIAMETER (MM)</th>
+                <th>PANJANG (MM)</th>
+                <th>TOTAL BERAT (KG)</th>
+                <th>HARGA/KG</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody id="bodyDiameter">
+            </tbody>
+    </table>
+
+    <table id="tabelPlat" class="hidden">
+        <thead>
+            <tr>
+                <th>QTY</th>
+                <th>TEBAL(MM)</th>
+                <th>LEBAR(MM)</th>
+                <th>PANJANG(MM)</th>
+                <th>TOTAL BERAT(KG)</th>
+                <th>HARGA / KG</th>
+                <th>TOTAL</th>
+            </tr>
+        </thead>
+        <tbody id="bodyPlat">
+            </tbody>
+    </table>
+
+    <script>
+        // Fungsi untuk mengganti tampilan form dan tabel sesuai pilihan
+        function toggleBaja() {
+            let jenis = document.getElementById('jenisBaja').value;
+            if (jenis === 'diameter') {
+                document.getElementById('formDiameter').classList.remove('hidden');
+                document.getElementById('tabelDiameter').classList.remove('hidden');
+                
+                document.getElementById('formPlat').classList.add('hidden');
+                document.getElementById('tabelPlat').classList.add('hidden');
+            } else {
+                document.getElementById('formPlat').classList.remove('hidden');
+                document.getElementById('tabelPlat').classList.remove('hidden');
+                
+                document.getElementById('formDiameter').classList.add('hidden');
+                document.getElementById('tabelDiameter').classList.add('hidden');
+            }
+        }
+
+        // Fungsi perhitungan untuk tipe Diameter
+        function hitungDiameter() {
+            let qty = parseFloat(document.getElementById('qtyDia').value);
+            let dia = parseFloat(document.getElementById('diaDia').value);
+            let panjangAsli = parseFloat(document.getElementById('panjangDia').value);
+            let harga = parseFloat(document.getElementById('hargaDia').value);
+
+            let panjangHitung = panjangAsli + 5;
+            
+            // Rumus: dia * dia * 0.00625 * (panjang+5) * qty
+            let totalBerat = dia * dia * 0.00625 * panjangHitung * qty;
+            
+            // Pembulatan 2 angka di belakang koma
+            totalBerat = parseFloat(totalBerat.toFixed(2));
+            
+            // Hitung harga total
+            let totalHarga = totalBerat * harga;
+
+            // Masukkan data ke dalam tabel
+            let tbody = document.getElementById('bodyDiameter');
+            let barisBaru = `<tr>
+                <td>${qty}</td>
+                <td>${dia}</td>
+                <td>${panjangAsli}</td>
+                <td>${totalBerat}</td>
+                <td>${harga}</td>
+                <td>${totalHarga}</td>
+            </tr>`;
+            
+            tbody.innerHTML += barisBaru;
+        }
+
+        // Fungsi perhitungan untuk tipe Plat
+        function hitungPlat() {
+            let qty = parseFloat(document.getElementById('qtyPlat').value);
+            let tebal = parseFloat(document.getElementById('tebalPlat').value);
+            let lebar = parseFloat(document.getElementById('lebarPlat').value);
+            let panjangAsli = parseFloat(document.getElementById('panjangPlat').value);
+            let harga = parseFloat(document.getElementById('hargaPlat').value);
+
+            let panjangHitung = panjangAsli + 5;
+            
+            // Rumus: tebal * lebar * (panjang+5) * 7.85 * 0.000001 * qty
+            let totalBerat = tebal * lebar * panjangHitung * 7.85 * 0.000001 * qty;
+            
+            // Pembulatan 2 angka di belakang koma
+            totalBerat = parseFloat(totalBerat.toFixed(2));
+            
+            // Hitung harga total
+            let totalHarga = totalBerat * harga;
+
+            // Masukkan data ke dalam tabel
+            let tbody = document.getElementById('bodyPlat');
+            let barisBaru = `<tr>
+                <td>${qty}</td>
+                <td>${tebal}</td>
+                <td>${lebar}</td>
+                <td>${panjangAsli}</td>
+                <td>${totalBerat}</td>
+                <td>${harga}</td>
+                <td>${totalHarga}</td>
+            </tr>`;
+            
+            tbody.innerHTML += barisBaru;
+        }
+    </script>
+</body>
+</html>
