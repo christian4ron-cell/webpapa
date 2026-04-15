@@ -43,7 +43,7 @@
             display: none;
         }
 
-        /* CSS KHUSUS UNTUK TABEL INVOICE BARU */
+        /* CSS KHUSUS UNTUK TABEL INVOICE */
         .invoice-table {
             width: 100%;
             border: 2px solid black;
@@ -81,62 +81,89 @@
         .col-weight { width: 10%; }
         .col-price { width: 20%; }
         .col-amount { width: 20%; }
+
+        /* Tombol navigasi halaman */
+        .btn-success { background-color: #28a745; margin-top: 20px; font-size: 16px; width: 432px;}
+        .btn-success:hover { background-color: #218838; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #c82333; }
+        .btn-print { background-color: #17a2b8; margin-left: 10px;}
+        .btn-print:hover { background-color: #138496; }
+
+        /* Menyembunyikan tombol saat di-print */
+        @media print {
+            .no-print { display: none !important; }
+            body { margin: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Kalkulator Baja</h2>
+    <div id="halamanInput">
+        <h2>Kalkulator Baja</h2>
 
-    <div class="form-section">
-        <div class="form-group">
-            <label>Pilih Jenis Barang:</label>
-            <select id="jenisBaja" onchange="toggleBaja()">
-                <option value="diameter">Diameter</option>
-                <option value="flat">Flat</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Nama Barang:</label>
-            <select id="namaBarang">
+        <div class="form-section">
+            <div class="form-group">
+                <label>Pilih Jenis Barang:</label>
+                <select id="jenisBaja" onchange="toggleBaja()">
+                    <option value="diameter">Diameter</option>
+                    <option value="flat">Flat</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label>Nama Barang:</label>
+                <select id="namaBarang">
+                    </select>
+            </div>
         </div>
+
+        <div id="formDiameter" class="form-section">
+            <h3>Input Diameter</h3>
+            <div class="form-group"><label>QTY:</label><input type="number" id="qtyDia"></div>
+            <div class="form-group"><label>Diameter (MM):</label><input type="number" id="diaDia" step="any"></div>
+            <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangDia" step="any"></div>
+            <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaDia" step="any"></div>
+            <button onclick="hitungDiameter()">Tambahkan ke Tabel</button>
+        </div>
+
+        <div id="formFlat" class="form-section hidden">
+            <h3>Input Flat</h3>
+            <div class="form-group"><label>QTY:</label><input type="number" id="qtyFlat"></div>
+            <div class="form-group"><label>Tebal (MM):</label><input type="number" id="tebalFlat" step="any"></div>
+            <div class="form-group"><label>Lebar (MM):</label><input type="number" id="lebarFlat" step="any"></div>
+            <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangFlat" step="any"></div>
+            <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaFlat" step="any"></div>
+            <button onclick="hitungFlat()">Tambahkan ke Tabel</button>
+        </div>
+
+        <button class="btn-success" onclick="lihatInvoice()">➡️ Lihat Halaman Invoice</button>
     </div>
 
-    <div id="formDiameter" class="form-section">
-        <h3>Input Diameter</h3>
-        <div class="form-group"><label>QTY:</label><input type="number" id="qtyDia"></div>
-        <div class="form-group"><label>Diameter (MM):</label><input type="number" id="diaDia" step="any"></div>
-        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangDia" step="any"></div>
-        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaDia" step="any"></div>
-        <button onclick="hitungDiameter()">Tambahkan ke Tabel</button>
-    </div>
 
-    <div id="formFlat" class="form-section hidden">
-        <h3>Input Flat</h3>
-        <div class="form-group"><label>QTY:</label><input type="number" id="qtyFlat"></div>
-        <div class="form-group"><label>Tebal (MM):</label><input type="number" id="tebalFlat" step="any"></div>
-        <div class="form-group"><label>Lebar (MM):</label><input type="number" id="lebarFlat" step="any"></div>
-        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangFlat" step="any"></div>
-        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaFlat" step="any"></div>
-        <button onclick="hitungFlat()">Tambahkan ke Tabel</button>
-    </div>
+    <div id="halamanInvoice" class="hidden">
+        
+        <div class="no-print" style="margin-bottom: 20px;">
+            <button class="btn-danger" onclick="kembaliKeInput()">⬅️ Kembali ke Input</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan PDF</button>
+        </div>
 
-    <table class="invoice-table" id="tabelInvoice">
-        <thead>
-            <tr>
-                <th class="col-item">Item</th>
-                <th class="col-desc">Description</th>
-                <th class="col-qty">Qty</th>
-                <th class="col-weight">Total Berat (KG)</th>
-                <th class="col-price">Unit Price</th>
-                <th class="col-amount">Amount</th>
-            </tr>
-        </thead>
-        <tbody id="invoiceBody">
-            </tbody>
-        <tfoot id="invoiceFooter">
-            </tfoot>
-    </table>
+        <table class="invoice-table" id="tabelInvoice">
+            <thead>
+                <tr>
+                    <th class="col-item">Item</th>
+                    <th class="col-desc">Description</th>
+                    <th class="col-qty">Qty</th>
+                    <th class="col-weight">Total Berat (KG)</th>
+                    <th class="col-price">Unit Price</th>
+                    <th class="col-amount">Amount</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceBody">
+                </tbody>
+            <tfoot id="invoiceFooter">
+                </tfoot>
+        </table>
+    </div>
 
     <script>
         // Data Nama Barang
@@ -146,6 +173,18 @@
         // Array untuk menyimpan seluruh data inputan
         let listBarang = [];
 
+        // FUNGSI NAVIGASI HALAMAN
+        function lihatInvoice() {
+            document.getElementById('halamanInput').classList.add('hidden');
+            document.getElementById('halamanInvoice').classList.remove('hidden');
+        }
+
+        function kembaliKeInput() {
+            document.getElementById('halamanInvoice').classList.add('hidden');
+            document.getElementById('halamanInput').classList.remove('hidden');
+        }
+
+        // FUNGSI APLIKASI
         function toggleBaja() {
             let jenis = document.getElementById('jenisBaja').value;
             let selectNama = document.getElementById('namaBarang');
@@ -262,6 +301,9 @@
             });
 
             renderTabel();
+            
+            // Opsional: Jika ingin memberi notifikasi data masuk
+            alert("Barang berhasil ditambahkan ke tabel!");
         }
 
         // Hitung Flat
@@ -298,6 +340,9 @@
             });
 
             renderTabel();
+            
+            // Opsional: Jika ingin memberi notifikasi data masuk
+            alert("Barang berhasil ditambahkan ke tabel!");
         }
 
         // Panggil saat pertama kali load untuk mengisi default Dropdown & Tabel
