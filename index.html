@@ -167,7 +167,7 @@
                     <tr>
                         <td>${i + 1}</td>
                         <td class="text-left">${barang.desc}</td>
-                        <td>${barang.qty} ea</td>
+                        <td>${barang.qty} pc</td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
                     </tr>
@@ -180,14 +180,10 @@
             let ppn = subTotal * 0.11; // PPn 11%
             let grandTotal = subTotal + ppn;
 
-            // Membangun Footer
+            // Membangun Footer (Tanpa teks Delivery Address)
             let htmlFooter = `
                 <tr>
-                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;">
-                        <span class="bold">Delivery Address :</span><br>
-                        PERGUDANGAN GEDANGAN INDUSTRIAL PARK<br>
-                        BLOK BH - 10 GEDANGAN - SIDOARJO - JAWA TIMUR
-                    </td>
+                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;"></td>
                     <td class="text-right">Sub Total</td>
                     <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(subTotal)}</span></td>
                 </tr>
