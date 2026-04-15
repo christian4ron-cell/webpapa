@@ -39,23 +39,46 @@
         button:hover {
             background-color: #0056b3;
         }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
         .hidden {
             display: none;
         }
+
+        /* CSS KHUSUS UNTUK TABEL INVOICE BARU */
+        .invoice-table {
+            width: 100%;
+            border: 2px solid black;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+        .invoice-table th, .invoice-table td {
+            border: 1px solid black;
+            padding: 4px 8px;
+            text-align: center;
+        }
+        .invoice-table th {
+            font-weight: bold;
+        }
+        /* Menghilangkan border horizontal antar item agar mirip gambar */
+        .invoice-table tbody td {
+            border-top: none;
+            border-bottom: none;
+            vertical-align: top;
+            height: 25px;
+        }
+        .invoice-table tfoot td {
+            border-top: 1px solid black;
+        }
+        .text-left { text-align: left !important; }
+        .text-right { text-align: right !important; }
+        .bold { font-weight: bold; }
+        
+        /* Lebar kolom spesifik */
+        .col-item { width: 5%; }
+        .col-desc { width: 45%; }
+        .col-qty { width: 10%; }
+        .col-price { width: 20%; }
+        .col-amount { width: 20%; }
     </style>
 </head>
 <body>
@@ -91,57 +114,96 @@
         <button onclick="hitungPlat()">Tambahkan ke Tabel</button>
     </div>
 
-    <table id="tabelDiameter">
+    <table class="invoice-table" id="tabelInvoice">
         <thead>
             <tr>
-                <th>QTY</th>
-                <th>DIAMETER (MM)</th>
-                <th>PANJANG (MM)</th>
-                <th>TOTAL BERAT (KG)</th>
-                <th>HARGA/KG</th>
-                <th>TOTAL</th>
+                <th class="col-item">Item</th>
+                <th class="col-desc">Description</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-price">Unit Price</th>
+                <th class="col-amount">Amount</th>
             </tr>
         </thead>
-        <tbody id="bodyDiameter">
+        <tbody id="invoiceBody">
             </tbody>
-    </table>
-
-    <table id="tabelPlat" class="hidden">
-        <thead>
-            <tr>
-                <th>QTY</th>
-                <th>TEBAL(MM)</th>
-                <th>LEBAR(MM)</th>
-                <th>PANJANG(MM)</th>
-                <th>TOTAL BERAT(KG)</th>
-                <th>HARGA / KG</th>
-                <th>TOTAL</th>
-            </tr>
-        </thead>
-        <tbody id="bodyPlat">
-            </tbody>
+        <tfoot id="invoiceFooter">
+            </tfoot>
     </table>
 
     <script>
-        // Fungsi untuk mengganti tampilan form dan tabel sesuai pilihan
+        // Array untuk menyimpan seluruh data inputan
+        let listBarang = [];
+
         function toggleBaja() {
             let jenis = document.getElementById('jenisBaja').value;
             if (jenis === 'diameter') {
                 document.getElementById('formDiameter').classList.remove('hidden');
-                document.getElementById('tabelDiameter').classList.remove('hidden');
-                
                 document.getElementById('formPlat').classList.add('hidden');
-                document.getElementById('tabelPlat').classList.add('hidden');
             } else {
                 document.getElementById('formPlat').classList.remove('hidden');
-                document.getElementById('tabelPlat').classList.remove('hidden');
-                
                 document.getElementById('formDiameter').classList.add('hidden');
-                document.getElementById('tabelDiameter').classList.add('hidden');
             }
         }
 
-        // Fungsi perhitungan untuk tipe Diameter
+        // Format angka dengan koma (Ribuan)
+        function formatRupiah(angka) {
+            return angka.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function renderTabel() {
+            let tbody = document.getElementById('invoiceBody');
+            let tfoot = document.getElementById('invoiceFooter');
+            
+            let htmlBody = '';
+            let subTotal = 0;
+            let i = 0;
+
+            // Membangun baris tabel menggunakan while loop
+            while (i < listBarang.length) {
+                let barang = listBarang[i];
+                subTotal += barang.amount;
+                
+                htmlBody += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td class="text-left">${barang.desc}</td>
+                        <td>${barang.qty} ea</td>
+                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
+                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
+                    </tr>
+                `;
+                i++;
+            }
+            tbody.innerHTML = htmlBody;
+
+            // Menghitung Pajak dan Total
+            let ppn = subTotal * 0.11; // PPn 11%
+            let grandTotal = subTotal + ppn;
+
+            // Membangun Footer
+            let htmlFooter = `
+                <tr>
+                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;">
+                        <span class="bold">Delivery Address :</span><br>
+                        PERGUDANGAN GEDANGAN INDUSTRIAL PARK<br>
+                        BLOK BH - 10 GEDANGAN - SIDOARJO - JAWA TIMUR
+                    </td>
+                    <td class="text-right">Sub Total</td>
+                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(subTotal)}</span></td>
+                </tr>
+                <tr>
+                    <td class="text-right">PPn 11%</td>
+                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(ppn)}</span></td>
+                </tr>
+                <tr>
+                    <td class="text-right bold">Total</td>
+                    <td class="bold"><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(grandTotal)}</span></td>
+                </tr>
+            `;
+            tfoot.innerHTML = htmlFooter;
+        }
+
+        // Hitung Diameter
         function hitungDiameter() {
             let qty = parseFloat(document.getElementById('qtyDia').value);
             let dia = parseFloat(document.getElementById('diaDia').value);
@@ -150,30 +212,26 @@
 
             let panjangHitung = panjangAsli + 5;
             
-            // Rumus BARU: dia * dia * 0.00625 * (panjang+5) * 0.001 * qty
-            let totalBerat = dia * dia * 0.00625 * panjangHitung * 0.001 * qty;
+            // Berat per 1 batang
+            let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
+            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
             
-            // Pembulatan 2 angka di belakang koma
-            totalBerat = parseFloat(totalBerat.toFixed(2));
+            let unitPrice = beratPerEa * harga;
+            let amount = unitPrice * qty;
             
-            // Hitung harga total
-            let totalHarga = totalBerat * harga;
+            let desc = `ROUND BAR dia ${dia}mm x Lg ${panjangAsli}mm`;
 
-            // Masukkan data ke dalam tabel
-            let tbody = document.getElementById('bodyDiameter');
-            let barisBaru = `<tr>
-                <td>${qty}</td>
-                <td>${dia}</td>
-                <td>${panjangAsli}</td>
-                <td>${totalBerat}</td>
-                <td>${harga}</td>
-                <td>${totalHarga}</td>
-            </tr>`;
-            
-            tbody.innerHTML += barisBaru;
+            listBarang.push({
+                desc: desc,
+                qty: qty,
+                unitPrice: Math.round(unitPrice),
+                amount: Math.round(amount)
+            });
+
+            renderTabel();
         }
 
-        // Fungsi perhitungan untuk tipe Plat (TIDAK DIUBAH)
+        // Hitung Plat
         function hitungPlat() {
             let qty = parseFloat(document.getElementById('qtyPlat').value);
             let tebal = parseFloat(document.getElementById('tebalPlat').value);
@@ -183,29 +241,27 @@
 
             let panjangHitung = panjangAsli + 5;
             
-            // Rumus: tebal * lebar * (panjang+5) * 7.85 * 0.000001 * qty
-            let totalBerat = tebal * lebar * panjangHitung * 7.85 * 0.000001 * qty;
+            // Berat per 1 lembar
+            let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
+            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
             
-            // Pembulatan 2 angka di belakang koma
-            totalBerat = parseFloat(totalBerat.toFixed(2));
-            
-            // Hitung harga total
-            let totalHarga = totalBerat * harga;
+            let unitPrice = beratPerEa * harga;
+            let amount = unitPrice * qty;
 
-            // Masukkan data ke dalam tabel
-            let tbody = document.getElementById('bodyPlat');
-            let barisBaru = `<tr>
-                <td>${qty}</td>
-                <td>${tebal}</td>
-                <td>${lebar}</td>
-                <td>${panjangAsli}</td>
-                <td>${totalBerat}</td>
-                <td>${harga}</td>
-                <td>${totalHarga}</td>
-            </tr>`;
-            
-            tbody.innerHTML += barisBaru;
+            let desc = `PLATE ${tebal}mm x ${lebar}mm x Lg ${panjangAsli}mm`;
+
+            listBarang.push({
+                desc: desc,
+                qty: qty,
+                unitPrice: Math.round(unitPrice),
+                amount: Math.round(amount)
+            });
+
+            renderTabel();
         }
+
+        // Render tabel kosong saat pertama kali di-load
+        renderTabel();
     </script>
 </body>
 </html>
