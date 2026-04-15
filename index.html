@@ -89,9 +89,14 @@
         <div class="form-group">
             <label>Pilih Jenis Barang:</label>
             <select id="jenisBaja" onchange="toggleBaja()">
-                <option value="diameter">Diameter (Round Bar)</option>
-                <option value="plat">Plat (Plate)</option>
+                <option value="diameter">Diameter</option>
+                <option value="flat">Flat</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label>Nama Barang:</label>
+            <select id="namaBarang">
+                </select>
         </div>
     </div>
 
@@ -104,160 +109,17 @@
         <button onclick="hitungDiameter()">Tambahkan ke Tabel</button>
     </div>
 
-    <div id="formPlat" class="form-section hidden">
-        <h3>Input Plat</h3>
-        <div class="form-group"><label>QTY:</label><input type="number" id="qtyPlat"></div>
-        <div class="form-group"><label>Tebal (MM):</label><input type="number" id="tebalPlat" step="any"></div>
-        <div class="form-group"><label>Lebar (MM):</label><input type="number" id="lebarPlat" step="any"></div>
-        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangPlat" step="any"></div>
-        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaPlat" step="any"></div>
-        <button onclick="hitungPlat()">Tambahkan ke Tabel</button>
+    <div id="formFlat" class="form-section hidden">
+        <h3>Input Flat</h3>
+        <div class="form-group"><label>QTY:</label><input type="number" id="qtyFlat"></div>
+        <div class="form-group"><label>Tebal (MM):</label><input type="number" id="tebalFlat" step="any"></div>
+        <div class="form-group"><label>Lebar (MM):</label><input type="number" id="lebarFlat" step="any"></div>
+        <div class="form-group"><label>Panjang (MM):</label><input type="number" id="panjangFlat" step="any"></div>
+        <div class="form-group"><label>Harga/KG (Rp):</label><input type="number" id="hargaFlat" step="any"></div>
+        <button onclick="hitungFlat()">Tambahkan ke Tabel</button>
     </div>
 
     <table class="invoice-table" id="tabelInvoice">
         <thead>
             <tr>
-                <th class="col-item">Item</th>
-                <th class="col-desc">Description</th>
-                <th class="col-qty">Qty</th>
-                <th class="col-price">Unit Price</th>
-                <th class="col-amount">Amount</th>
-            </tr>
-        </thead>
-        <tbody id="invoiceBody">
-            </tbody>
-        <tfoot id="invoiceFooter">
-            </tfoot>
-    </table>
-
-    <script>
-        // Array untuk menyimpan seluruh data inputan
-        let listBarang = [];
-
-        function toggleBaja() {
-            let jenis = document.getElementById('jenisBaja').value;
-            if (jenis === 'diameter') {
-                document.getElementById('formDiameter').classList.remove('hidden');
-                document.getElementById('formPlat').classList.add('hidden');
-            } else {
-                document.getElementById('formPlat').classList.remove('hidden');
-                document.getElementById('formDiameter').classList.add('hidden');
-            }
-        }
-
-        // Format angka dengan koma (Ribuan)
-        function formatRupiah(angka) {
-            return angka.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-        }
-
-        function renderTabel() {
-            let tbody = document.getElementById('invoiceBody');
-            let tfoot = document.getElementById('invoiceFooter');
-            
-            let htmlBody = '';
-            let subTotal = 0;
-            let i = 0;
-
-            // Membangun baris tabel menggunakan while loop
-            while (i < listBarang.length) {
-                let barang = listBarang[i];
-                subTotal += barang.amount;
-                
-                htmlBody += `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td class="text-left">${barang.desc}</td>
-                        <td>${barang.qty} pc</td>
-                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
-                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
-                    </tr>
-                `;
-                i++;
-            }
-            tbody.innerHTML = htmlBody;
-
-            // Menghitung Pajak dan Total
-            let ppn = subTotal * 0.11; // PPn 11%
-            let grandTotal = subTotal + ppn;
-
-            // Membangun Footer (Tanpa teks Delivery Address)
-            let htmlFooter = `
-                <tr>
-                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;"></td>
-                    <td class="text-right">Sub Total</td>
-                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(subTotal)}</span></td>
-                </tr>
-                <tr>
-                    <td class="text-right">PPn 11%</td>
-                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(ppn)}</span></td>
-                </tr>
-                <tr>
-                    <td class="text-right bold">Total</td>
-                    <td class="bold"><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(grandTotal)}</span></td>
-                </tr>
-            `;
-            tfoot.innerHTML = htmlFooter;
-        }
-
-        // Hitung Diameter
-        function hitungDiameter() {
-            let qty = parseFloat(document.getElementById('qtyDia').value);
-            let dia = parseFloat(document.getElementById('diaDia').value);
-            let panjangAsli = parseFloat(document.getElementById('panjangDia').value);
-            let harga = parseFloat(document.getElementById('hargaDia').value);
-
-            let panjangHitung = panjangAsli + 5;
-            
-            // Berat per 1 batang
-            let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
-            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
-            
-            let unitPrice = beratPerEa * harga;
-            let amount = unitPrice * qty;
-            
-            let desc = `ROUND BAR dia ${dia}mm x Lg ${panjangAsli}mm`;
-
-            listBarang.push({
-                desc: desc,
-                qty: qty,
-                unitPrice: Math.round(unitPrice),
-                amount: Math.round(amount)
-            });
-
-            renderTabel();
-        }
-
-        // Hitung Plat
-        function hitungPlat() {
-            let qty = parseFloat(document.getElementById('qtyPlat').value);
-            let tebal = parseFloat(document.getElementById('tebalPlat').value);
-            let lebar = parseFloat(document.getElementById('lebarPlat').value);
-            let panjangAsli = parseFloat(document.getElementById('panjangPlat').value);
-            let harga = parseFloat(document.getElementById('hargaPlat').value);
-
-            let panjangHitung = panjangAsli + 5;
-            
-            // Berat per 1 lembar
-            let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
-            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
-            
-            let unitPrice = beratPerEa * harga;
-            let amount = unitPrice * qty;
-
-            let desc = `PLATE ${tebal}mm x ${lebar}mm x Lg ${panjangAsli}mm`;
-
-            listBarang.push({
-                desc: desc,
-                qty: qty,
-                unitPrice: Math.round(unitPrice),
-                amount: Math.round(amount)
-            });
-
-            renderTabel();
-        }
-
-        // Render tabel kosong saat pertama kali di-load
-        renderTabel();
-    </script>
-</body>
-</html>
+                <th class="col-item
