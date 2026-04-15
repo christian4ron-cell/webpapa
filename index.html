@@ -58,6 +58,7 @@
         }
         .invoice-table th {
             font-weight: bold;
+            background-color: #f2f2f2;
         }
         /* Menghilangkan border horizontal antar item agar mirip gambar */
         .invoice-table tbody td {
@@ -75,8 +76,9 @@
         
         /* Lebar kolom spesifik */
         .col-item { width: 5%; }
-        .col-desc { width: 45%; }
+        .col-desc { width: 35%; }
         .col-qty { width: 10%; }
+        .col-weight { width: 10%; }
         .col-price { width: 20%; }
         .col-amount { width: 20%; }
     </style>
@@ -125,6 +127,7 @@
                 <th class="col-item">Item</th>
                 <th class="col-desc">Description</th>
                 <th class="col-qty">Qty</th>
+                <th class="col-weight">Total Berat (KG)</th>
                 <th class="col-price">Unit Price</th>
                 <th class="col-amount">Amount</th>
             </tr>
@@ -194,6 +197,7 @@
                         <td>${i + 1}</td>
                         <td class="text-left">${barang.desc}</td>
                         <td>${barang.qty} pc</td>
+                        <td>${barang.totalBerat}</td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
                     </tr>
@@ -206,10 +210,10 @@
             let ppn = subTotal * 0.11; // PPn 11%
             let grandTotal = subTotal + ppn;
 
-            // Membangun Footer
+            // Membangun Footer (colspan disesuaikan menjadi 4 karena ada tambahan kolom)
             let htmlFooter = `
                 <tr>
-                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;"></td>
+                    <td colspan="4" rowspan="3" class="text-left" style="vertical-align: top;"></td>
                     <td class="text-right">Sub Total</td>
                     <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(subTotal)}</span></td>
                 </tr>
@@ -239,15 +243,20 @@
             let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
             beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
             
+            // Hitung Total Berat
+            let totalBerat = beratPerEa * qty;
+            totalBerat = parseFloat(totalBerat.toFixed(2));
+
             let unitPrice = beratPerEa * harga;
             let amount = unitPrice * qty;
             
-            // Pembaruan deskripsi: [nama barang] ROUND BAR dia [dia]mm x Lg [panjang]mm
-            let desc = `${namaBarang} ROUND BAR dia ${dia}mm x Lg ${panjangAsli}mm`;
+            // Pembaruan deskripsi: Menghapus tulisan "Lg "
+            let desc = `${namaBarang} ROUND BAR dia ${dia}mm x ${panjangAsli}mm`;
 
             listBarang.push({
                 desc: desc,
                 qty: qty,
+                totalBerat: totalBerat,
                 unitPrice: Math.round(unitPrice),
                 amount: Math.round(amount)
             });
@@ -270,15 +279,20 @@
             let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
             beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
             
+            // Hitung Total Berat
+            let totalBerat = beratPerEa * qty;
+            totalBerat = parseFloat(totalBerat.toFixed(2));
+
             let unitPrice = beratPerEa * harga;
             let amount = unitPrice * qty;
 
-            // Pembaruan deskripsi: [nama barang] FLAT [tebal]mm x [lebar]mm x Lg [panjang]mm
-            let desc = `${namaBarang} FLAT ${tebal}mm x ${lebar}mm x Lg ${panjangAsli}mm`;
+            // Pembaruan deskripsi: Menghapus tulisan "Lg "
+            let desc = `${namaBarang} FLAT ${tebal}mm x ${lebar}mm x ${panjangAsli}mm`;
 
             listBarang.push({
                 desc: desc,
                 qty: qty,
+                totalBerat: totalBerat,
                 unitPrice: Math.round(unitPrice),
                 amount: Math.round(amount)
             });
