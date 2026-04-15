@@ -150,8 +150,8 @@
 
             let panjangHitung = panjangAsli + 5;
             
-            // Rumus: dia * dia * 0.00625 * (panjang+5) * qty
-            let totalBerat = dia * dia * 0.00625 * panjangHitung * qty;
+            // Rumus BARU: dia * dia * 0.00625 * (panjang+5) * 0.001 * qty
+            let totalBerat = dia * dia * 0.00625 * panjangHitung * 0.001 * qty;
             
             // Pembulatan 2 angka di belakang koma
             totalBerat = parseFloat(totalBerat.toFixed(2));
@@ -173,7 +173,7 @@
             tbody.innerHTML += barisBaru;
         }
 
-        // Fungsi perhitungan untuk tipe Plat
+        // Fungsi perhitungan untuk tipe Plat (TIDAK DIUBAH)
         function hitungPlat() {
             let qty = parseFloat(document.getElementById('qtyPlat').value);
             let tebal = parseFloat(document.getElementById('tebalPlat').value);
