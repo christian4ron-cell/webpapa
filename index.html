@@ -122,4 +122,175 @@
     <table class="invoice-table" id="tabelInvoice">
         <thead>
             <tr>
-                <th class="col-item
+                <th class="col-item">Item</th>
+                <th class="col-desc">Description</th>
+                <th class="col-qty">Qty</th>
+                <th class="col-price">Unit Price</th>
+                <th class="col-amount">Amount</th>
+            </tr>
+        </thead>
+        <tbody id="invoiceBody">
+            </tbody>
+        <tfoot id="invoiceFooter">
+            </tfoot>
+    </table>
+
+    <script>
+        // Data Nama Barang
+        const barangDiameter = ["S45C", "SCM 440", "SCM 415", "4340", "4340 QT", "6582", "7225", "1730", "2316", "2510", "2080", "2379", "2344"];
+        const barangFlat = ["1730", "2311", "2316", "ABREX 400", "ABREX 500", "2510", "2080", "2379", "2344"];
+
+        // Array untuk menyimpan seluruh data inputan
+        let listBarang = [];
+
+        function toggleBaja() {
+            let jenis = document.getElementById('jenisBaja').value;
+            let selectNama = document.getElementById('namaBarang');
+            
+            // Kosongkan pilihan nama barang sebelumnya
+            selectNama.innerHTML = '';
+
+            if (jenis === 'diameter') {
+                // Tampilkan Form Diameter
+                document.getElementById('formDiameter').classList.remove('hidden');
+                document.getElementById('formFlat').classList.add('hidden');
+                
+                // Isi Dropdown Nama Barang
+                barangDiameter.forEach(nama => {
+                    selectNama.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            } else {
+                // Tampilkan Form Flat
+                document.getElementById('formFlat').classList.remove('hidden');
+                document.getElementById('formDiameter').classList.add('hidden');
+                
+                // Isi Dropdown Nama Barang
+                barangFlat.forEach(nama => {
+                    selectNama.innerHTML += `<option value="${nama}">${nama}</option>`;
+                });
+            }
+        }
+
+        // Format angka dengan koma (Ribuan)
+        function formatRupiah(angka) {
+            return angka.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function renderTabel() {
+            let tbody = document.getElementById('invoiceBody');
+            let tfoot = document.getElementById('invoiceFooter');
+            
+            let htmlBody = '';
+            let subTotal = 0;
+            let i = 0;
+
+            // Membangun baris tabel menggunakan while loop
+            while (i < listBarang.length) {
+                let barang = listBarang[i];
+                subTotal += barang.amount;
+                
+                htmlBody += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td class="text-left">${barang.desc}</td>
+                        <td>${barang.qty} pc</td>
+                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
+                        <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
+                    </tr>
+                `;
+                i++;
+            }
+            tbody.innerHTML = htmlBody;
+
+            // Menghitung Pajak dan Total
+            let ppn = subTotal * 0.11; // PPn 11%
+            let grandTotal = subTotal + ppn;
+
+            // Membangun Footer
+            let htmlFooter = `
+                <tr>
+                    <td colspan="3" rowspan="3" class="text-left" style="vertical-align: top;"></td>
+                    <td class="text-right">Sub Total</td>
+                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(subTotal)}</span></td>
+                </tr>
+                <tr>
+                    <td class="text-right">PPn 11%</td>
+                    <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(ppn)}</span></td>
+                </tr>
+                <tr>
+                    <td class="text-right bold">Total</td>
+                    <td class="bold"><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(grandTotal)}</span></td>
+                </tr>
+            `;
+            tfoot.innerHTML = htmlFooter;
+        }
+
+        // Hitung Diameter
+        function hitungDiameter() {
+            let namaBarang = document.getElementById('namaBarang').value;
+            let qty = parseFloat(document.getElementById('qtyDia').value);
+            let dia = parseFloat(document.getElementById('diaDia').value);
+            let panjangAsli = parseFloat(document.getElementById('panjangDia').value);
+            let harga = parseFloat(document.getElementById('hargaDia').value);
+
+            let panjangHitung = panjangAsli + 5;
+            
+            // Berat per 1 batang
+            let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
+            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
+            
+            let unitPrice = beratPerEa * harga;
+            let amount = unitPrice * qty;
+            
+            // Pembaruan deskripsi: [nama barang] ROUND BAR dia [dia]mm x Lg [panjang]mm
+            let desc = `${namaBarang} ROUND BAR dia ${dia}mm x Lg ${panjangAsli}mm`;
+
+            listBarang.push({
+                desc: desc,
+                qty: qty,
+                unitPrice: Math.round(unitPrice),
+                amount: Math.round(amount)
+            });
+
+            renderTabel();
+        }
+
+        // Hitung Flat
+        function hitungFlat() {
+            let namaBarang = document.getElementById('namaBarang').value;
+            let qty = parseFloat(document.getElementById('qtyFlat').value);
+            let tebal = parseFloat(document.getElementById('tebalFlat').value);
+            let lebar = parseFloat(document.getElementById('lebarFlat').value);
+            let panjangAsli = parseFloat(document.getElementById('panjangFlat').value);
+            let harga = parseFloat(document.getElementById('hargaFlat').value);
+
+            let panjangHitung = panjangAsli + 5;
+            
+            // Berat per 1 lembar
+            let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
+            beratPerEa = parseFloat(beratPerEa.toFixed(2)); // Pembulatan 2 angka belakang koma
+            
+            let unitPrice = beratPerEa * harga;
+            let amount = unitPrice * qty;
+
+            // Pembaruan deskripsi: [nama barang] FLAT [tebal]mm x [lebar]mm x Lg [panjang]mm
+            let desc = `${namaBarang} FLAT ${tebal}mm x ${lebar}mm x Lg ${panjangAsli}mm`;
+
+            listBarang.push({
+                desc: desc,
+                qty: qty,
+                unitPrice: Math.round(unitPrice),
+                amount: Math.round(amount)
+            });
+
+            renderTabel();
+        }
+
+        // Panggil saat pertama kali load untuk mengisi default Dropdown & Tabel
+        window.onload = function() {
+            toggleBaja();
+            renderTabel();
+        };
+    </script>
+</body>
+</html>
