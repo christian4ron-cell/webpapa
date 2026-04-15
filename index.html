@@ -166,8 +166,8 @@
     </div>
 
     <script>
-        // Data Nama Barang
-        const barangDiameter = ["S45C", "SCM 440", "SCM 415", "4340", "4340 QT", "6582", "7225", "1730", "2316", "2510", "2080", "2379", "2344"];
+        // Data Nama Barang (Pembaruan Daftar Diameter)
+        const barangDiameter = ["S45C", "SCM 440", "SCM 415", "4140", "4340", "4340 QT", "6582", "7225", "1730", "2316", "2510", "2080", "2379", "2344"];
         const barangFlat = ["1730", "2311", "2316", "ABREX 400", "ABREX 500", "2510", "2080", "2379", "2344"];
 
         // Array untuk menyimpan seluruh data inputan
@@ -289,8 +289,8 @@
             let unitPrice = beratPerEa * harga;
             let amount = unitPrice * qty;
             
-            // Pembaruan deskripsi: Menghapus tulisan "Lg "
-            let desc = `${namaBarang} ROUND BAR dia ${dia}mm x ${panjangAsli}mm`;
+            // Pembaruan deskripsi: Menghapus tulisan "Lg " dan "BAR"
+            let desc = `${namaBarang} ROUND dia ${dia}mm x ${panjangAsli}mm`;
 
             listBarang.push({
                 desc: desc,
