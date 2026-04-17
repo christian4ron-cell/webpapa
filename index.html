@@ -168,6 +168,11 @@
     </div>
 
     <script>
+        // Fungsi pembulatan ke 2 desimal yang memperhitungkan seluruh digit dari ke-3 dan seterusnya
+        function bulatkanCustom(angka) {
+            return Number(Math.round(angka + "e2") + "e-2");
+        }
+
         // Data Nama Barang
         const barangDiameter = ["S45C", "SCM 440", "SCM 415", "4140", "4340", "4340 QT", "6582", "7225", "1730", "2316", "2510", "2080", "2379", "2344"];
         const barangFlat = ["1730", "2311", "2316", "ABREX 400", "ABREX 500", "2510", "2080", "2379", "2344"];
@@ -279,11 +284,11 @@
             
             // Berat per 1 batang
             let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
-            beratPerEa = parseFloat(beratPerEa.toFixed(2)); 
+            beratPerEa = bulatkanCustom(beratPerEa); 
             
             // Hitung Total Berat
             let totalBerat = beratPerEa * qty;
-            totalBerat = parseFloat(totalBerat.toFixed(2));
+            totalBerat = bulatkanCustom(totalBerat);
 
             let unitPrice = beratPerEa * harga;
             let amount = unitPrice * qty;
@@ -317,11 +322,11 @@
             
             // Berat per 1 lembar
             let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
-            beratPerEa = parseFloat(beratPerEa.toFixed(2)); 
+            beratPerEa = bulatkanCustom(beratPerEa); 
             
             // Hitung Total Berat
             let totalBerat = beratPerEa * qty;
-            totalBerat = parseFloat(totalBerat.toFixed(2));
+            totalBerat = bulatkanCustom(totalBerat);
 
             let unitPrice = beratPerEa * harga;
             let amount = unitPrice * qty;
