@@ -234,12 +234,15 @@
                 let barang = listBarang[i];
                 subTotal += barang.amount;
                 
+                // Ubah titik menjadi koma untuk tampilan berat di tabel
+                let beratTampil = String(barang.totalBerat).replace('.', ',');
+                
                 htmlBody += `
                     <tr>
                         <td>${i + 1}</td>
                         <td class="text-left">${barang.desc}</td>
                         <td>${barang.qty} pc</td>
-                        <td>${barang.totalBerat}</td>
+                        <td>${beratTampil}</td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.hargaKg)}</span></td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.unitPrice)}</span></td>
                         <td><span style="float:left">Rp</span> <span style="float:right">${formatRupiah(barang.amount)}</span></td>
@@ -282,16 +285,20 @@
 
             let panjangHitung = panjangAsli + 5;
             
-            // Berat per 1 batang
-            let beratPerEa = dia * dia * 0.00625 * panjangHitung * 0.001;
-            beratPerEa = bulatkanCustom(beratPerEa); 
+            // Simpan berat asli (belum dibulatkan) untuk perhitungan
+            let beratPerEaAsli = dia * dia * 0.00625 * panjangHitung * 0.001;
             
-            // Hitung Total Berat
-            let totalBerat = beratPerEa * qty;
+            // Berat per 1 batang dibulatkan jika nantinya perlu untuk Unit Price
+            let beratPerEa = bulatkanCustom(beratPerEaAsli); 
+            
+            // Hitung Total Berat dengan MENGGUNAKAN BERAT ASLI, lalu dibulatkan
+            let totalBerat = beratPerEaAsli * qty;
             totalBerat = bulatkanCustom(totalBerat);
 
             let unitPrice = beratPerEa * harga;
-            let amount = unitPrice * qty;
+            
+            // Agar konsisten, Amount dihitung dari Total Berat (dibulatkan) x Harga/KG
+            let amount = totalBerat * harga; 
             
             // Pembaruan deskripsi: Menghapus tulisan "Lg " dan menjadi "Round"
             let desc = `${namaBarang} Round dia ${dia}mm x ${panjangAsli}mm`;
@@ -320,16 +327,20 @@
 
             let panjangHitung = panjangAsli + 5;
             
-            // Berat per 1 lembar
-            let beratPerEa = tebal * lebar * panjangHitung * 7.85 * 0.000001;
-            beratPerEa = bulatkanCustom(beratPerEa); 
+            // Simpan berat asli (belum dibulatkan) untuk perhitungan
+            let beratPerEaAsli = tebal * lebar * panjangHitung * 7.85 * 0.000001;
             
-            // Hitung Total Berat
-            let totalBerat = beratPerEa * qty;
+            // Berat per 1 lembar dibulatkan jika nantinya perlu untuk Unit Price
+            let beratPerEa = bulatkanCustom(beratPerEaAsli); 
+            
+            // Hitung Total Berat dengan MENGGUNAKAN BERAT ASLI, lalu dibulatkan
+            let totalBerat = beratPerEaAsli * qty;
             totalBerat = bulatkanCustom(totalBerat);
 
             let unitPrice = beratPerEa * harga;
-            let amount = unitPrice * qty;
+            
+            // Agar konsisten, Amount dihitung dari Total Berat (dibulatkan) x Harga/KG
+            let amount = totalBerat * harga;
 
             // Pembaruan deskripsi: Menghapus tulisan "Lg " dan menjadi "Flat"
             let desc = `${namaBarang} Flat ${tebal}mm x ${lebar}mm x ${panjangAsli}mm`;
