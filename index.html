@@ -300,8 +300,8 @@
             // Agar konsisten, Amount dihitung dari Total Berat (dibulatkan) x Harga/KG
             let amount = totalBerat * harga; 
             
-            // Pembaruan deskripsi: Menghapus tulisan "Lg " dan menjadi "Round"
-            let desc = `${namaBarang} Round dia ${dia}mm x ${panjangAsli}mm`;
+            // Pembaruan deskripsi: Menghapus tulisan "Lg " dan menjadi "Round", serta MENGHAPUS kata "dia "
+            let desc = `${namaBarang} Round ${dia}mm x ${panjangAsli}mm`;
 
             listBarang.push({
                 desc: desc,
